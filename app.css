@@ -1,4 +1,9 @@
 /* General Styles */
+
+* {
+    box-sizing: border-box;
+}
+
 body {
     background: rgb(111, 208, 224);
     background: linear-gradient(0deg,rgb(111, 208, 224) 0%, rgb(171, 228, 167) 100%);
@@ -88,7 +93,7 @@ p {
 }
 
 @media (min-width: 550px) {
-    #grid div {
+    #grid .grid-item {
         width: calc(100% / 3);
     }
 }
@@ -132,10 +137,11 @@ form p {
     font-family: 'Oswald', sans-serif;
 }
 
-input {
+input,
+select {
     padding: 0.7em;
     background: #fff;
-    border: 0;
+    border: 1px solid #ffffff00;
 }
 
 .form-field__short {
@@ -171,4 +177,37 @@ select {
 .fine-print {
     display: block;
     font-size: 0.7em;
+}
+
+.hidden {
+    display: none;
+}
+
+.field-error {
+    border: 1px solid red;
+}
+
+.grid-text {
+    color: #fff;
+    display: flex;
+    position: absolute;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.grid-text.name {
+    font-family: 'Frijole', cursive;
+    top: 0;
+}
+
+.grid-text.fact {
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.466);
+    padding: 10px 5px;
+
+}
+
+.grid-text h2 {
+    margin: 5px;
 }

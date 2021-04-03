@@ -12,6 +12,7 @@
     <link href="app.css" rel="stylesheet">
     <!-- Link to app.js with defer till HTML render -->
     <script defer src="app.js"></script>
+    <script src="dino.json"></script>
 </head>
 <body>
     <header>
@@ -23,14 +24,14 @@
     <form id="dino-compare">
         <div class="form-container">
             <p>Name:</p>
-            <input id="name" class="form-field__full" type="name" name="name">
+            <input id="name" class="form-field__full" type="name" name="name" required>
             <p>Height</p>
-            <label>Feet: <input id="feet" class="form-field__short" type="number" name="feet"></label>
+            <label>Feet: <input id="feet" class="form-field__short" type="number" name="feet" required></label>
             <label>inches: <input id="inches" class="form-field__short" type="number" name="inches"></label>
             <p>Weight:</p>
-            <label><input id="weight" class="form-field__full" type="number" name="weight">lbs</label>
+            <label><input id="weight" class="form-field__full" type="number" name="weight" required>lbs</label>
             <p>Diet:</p>
-            <select id="diet" class="form-field__full" name="diet">
+            <select id="diet" class="form-field__full" name="diet" required>
                 <option>Herbavor</option>
                 <option>Omnivor</option>
                 <option>Carnivor</option>
@@ -39,7 +40,8 @@
         </div>
     </form>
     <!-- .grid to attach tiles to -->
-    <main id="grid"></main>
+    <main id="grid">
+    </main>
     <footer>
         <!-- Include information source -->
         <p class="fine-print">Data Sourced from <a href="https://www.wikipedia.org/">Wikipedia.org</a>, all numbers are approximations.</p>
