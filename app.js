@@ -192,7 +192,7 @@ function createGridItem(specimen) {
     const factBox = document.createElement('div');
     gridItem.classList.add('grid-item');
     grid.appendChild(gridItem);
-    img.setAttribute('src', `images/${specimen.species}.png`);
+    img.setAttribute('src', `images/${(specimen.species).toLowerCase()}.png`);
     gridItem.appendChild(img);
     titleBox.classList.add('grid-text', 'name');
     titleBox.innerHTML = `<h2>${title}</h2>`;
