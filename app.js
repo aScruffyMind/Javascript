@@ -1,3 +1,5 @@
+let dinosaurArray = []; // remove before turning in
+
 // FUNCTIONS
 const btnClick = (function () { // IIFE declaration to return function for button click event listener
     let readyToSubmit;
@@ -46,11 +48,11 @@ function Human(name, feet, inches, weight, diet) {
         return feet * 12 + inches;
     })();
     this.weight = weight;
-    this.diet = diet;
+    this.diet = diet.toLowerCase();
 }
 
 // Constructor function to create the dinosaurs
-function Dinos(specimen) {
+function Dinos(specimen) { // units are lbs and inches
     this.species = specimen.species;
     this.weight = specimen.weight;
     this.height = specimen.height;
@@ -60,21 +62,102 @@ function Dinos(specimen) {
     this.fact = specimen.fact;
 }
 
-Dinos.prototype.compareWeight = function () {
-    console.log(`this will compare your weight to the dinos.`);
+Dinos.prototype.compareWeight = function (weight) { // compare weight in argument to dino weight.
+    if (weight > this.weight) {
+        return `You outweigh a ${this.species} by ${(weight - this.weight).toLocaleString()} pounds.`;
+    } else if (weight < this.weight) {
+        return `A ${this.species} is ${(this.weight - weight).toLocaleString()} pounds heavier than you.`;
+    } else {
+        return `You and a ${this.species} weigh exactly the same.`;
+    }
 };
+
+Dinos.prototype.compareHeight = function (height) {
+    if (height > this.height) { // Execute if human is taller than dinosaur
+        return `You are ${convertInches(height - this.height)} taller than a ${this.species}!`;
+    } else if (height < this.height) { // Execute if dinosaur is taller than human
+        return `A ${this.species} is ${convertInches(this.height - height)} taller than you!`;
+    } else { // execute if neither human nor dinosaur is taller
+        return `You are the same height as a ${this.species}.`;
+    }
+};
+
+Dinos.prototype.compareDiet = function(diet) {
+    const humanDiet = diet.toLowerCase();
+    const dinoDiet = this.diet.toLowerCase();
+    if (humanDiet === dinoDiet) {
+        return `You and ${this.species} are both ${dinoDiet}s.`
+    } else {
+        return `${this.species} is ${(dinoDiet[0] === 'c') ? 'a' : 'an'} ${dinoDiet}.`;
+    }
+};
+
+Dinos.prototype.geography = function() {
+    switch (this.where) {
+        case 'North America':
+            return `${this.species} lived in ${this.where}`;
+            break;
+        case 'North America, Europe, Asia':
+            return `${this.species} could be found in North America, Europe and Asia.`;
+            break;
+        case 'World Wide':
+            return `${this.species} could be found all over the world.`;
+            break;
+    }
+};
+
+Dinos.prototype.period = function() {
+    return `${this.species} lived during the ${this.when} period.`;
+};
+
 
 function shuffle(array) {
     array.sort(() => Math.random() - 0.5);
 }
 
-function createGrid(human) {
+function createGrid(human) { // human variable is accessible here
     const dinosaurs = (function createDinos() {
         let dinoArray = [];
+        let possibleFacts = ['height', 'weight', 'diet', 'where', 'when'];
+
         for (d = 0; d < data.Dinos.length; d++) {
-            let currentDino = new Dinos(data.Dinos[d]);
+            let currentDino = new Dinos(data.Dinos[d]); // add RandomFact here
+
+            currentDino.displayFact = (function() {
+                if (currentDino.species === 'Pigeon') return currentDino.fact;
+                if (Math.floor(Math.random() * 100) < 40) return currentDino.fact;
+                let randomFact;
+                let rando = Math.floor(Math.random() * possibleFacts.length);
+                                
+                switch (rando) {
+                    case 0:
+                        randomFact = currentDino.compareHeight(human.height);
+                        break;
+                    case 1:
+                        randomFact = currentDino.compareWeight(human.weight);
+                        break;
+                    case 2:
+                        randomFact = currentDino.compareDiet(human.diet);
+                        break;
+                    case 3:
+                        randomFact = currentDino.geography();
+                        break;
+                    case 4:
+                        randomFact = currentDino.period();
+                        break;
+                    default: 
+                        randomFact = currentDino.fact;
+                    }
+
+                return randomFact;
+                })();
+            
+            // console.log(`The random fact for ${currentDino.species} is ${currentDino.randomFact}`);
+            
             dinoArray.push(currentDino);
         }
+        dinosaurArray = dinoArray;
+        
         return dinoArray;
     })();
 
@@ -116,20 +199,15 @@ function createGridItem(specimen) {
     gridItem.appendChild(titleBox);
     if (specimen.species != 'human') {
         factBox.classList.add('grid-text', 'fact');
-        factBox.innerHTML = `<h2>${specimen.fact}</h2>`
+        factBox.innerHTML = `<h2>${specimen.displayFact}</h2>`
         gridItem.appendChild(factBox);
     }
 }
 
 document.getElementById('btn').addEventListener('click', btnClick);
 
-// Create Dino Compare Method 1
-// NOTE: Weight in JSON file is in lbs, height in inches. 
-
-
-// Create Dino Compare Method 2
-// NOTE: Weight in JSON file is in lbs, height in inches.
-
-
-// Create Dino Compare Method 3
-// NOTE: Weight in JSON file is in lbs, height in inches.
+function convertInches(i) {
+    let feet = Math.floor(i / 12);
+    let inches = i % 12;
+    return `${(feet === 0) ? '' : feet + `'`}${(inches === 0) ? '' : inches + `"`}`;
+}
