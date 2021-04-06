@@ -1,49 +1,47 @@
 let dinosaurArray = []; // remove before turning in
 
 // FUNCTIONS
-const btnClick = (function () { // IIFE declaration to return function for button click event listener
-    let readyToSubmit;
-    const inputIDs = getInputIDs();
+const btnClick = (() => { // IIFE declaration to return function for button click event listener
+    let readyToSubmit; // initialize the readyToSubmit flag in the closure
+    const inputIDs = (() =>{ // IIFE to return all inputIDs in an array
+        const ids = []; // establish empty array to store input IDs
+        document.querySelectorAll('input, select').forEach((x) => ids.push(x.id)); // populate ids array from DOM    
+        return ids;
+    })(); 
     const myForm = document.forms['dino-compare'];
-    return function () { // return this function to the variable btnClick
-        readyToSubmit = true; // assume form ok to submit unless variable becomes false
-        for (f = 0; f < inputIDs.length; f++) { // run a for loop to check if each field is empty and required.
-            const item = document.getElementById(inputIDs[f]);
+
+    return function() { // return this function to the variable btnClick
+        readyToSubmit = true; // assume form ok to submit unless this flag becomes false
+
+        inputIDs.forEach((id)=> { // loop to check form for invalid fields before submitting
+            const item = document.getElementById(id);
             const required = item.hasAttribute('required');
             if (item.value === '' && required == true) { // check if field is empty and required
                 item.classList.add('field-error'); // add a red border around input field
                 readyToSubmit = false; // mark this form as not ready to submit
-                // if the item checks out and has the field-error class, remove it.
+            // else if the item checks out and has the field-error class, remove it.
             } else if (item.classList.contains('field-error')) item.classList.remove('field-error');
-        }
+        });
+
         if (readyToSubmit) { // execute this code if readyToSubmit is true at this point
+            // stuff form fields into variables to pass into the constructor function
             const name = myForm.name.value;
             const feet = Number(myForm.feet.value);
             const inches = Number(myForm.inches.value);
             const weight = Number(myForm.weight.value);
             const diet = myForm.diet.value;
+            // pass the variables above into the human constructor function.
             human = new Human(name, feet, inches, weight, diet);
-            document.getElementById('dino-compare').remove('');
-            createGrid(human);
+            document.getElementById('dino-compare').remove(); // remove the form from the DOM
+            createGrid(human); // pass the human into the grid creator... let's go!
         };
     };
 })();
-
-function getInputIDs() { // gather the IDs of all inputs & selects on form
-    const inputs = document.querySelectorAll('input');
-    const select = document.querySelectorAll('select');
-    const ids = []; // establish empty array to store input IDs
-    for (i = 0; i < inputs.length; i++) ids.push(inputs[i].id); // populate input IDs into array
-    for (s = 0; s < select.length; s++) ids.push(select[s].id); // populate select IDs into array
-    return ids; // return array of IDs
-}
 
 // Constructor function to create new human object
 function Human(name, feet, inches, weight, diet) {
     this.species = 'human';
     this.name = name;
-    this.feet = feet;
-    this.inches = inches;
     this.height = (function () {
         return feet * 12 + inches;
     })();
@@ -52,57 +50,50 @@ function Human(name, feet, inches, weight, diet) {
 }
 
 // Constructor function to create the dinosaurs
-function Dinos(specimen) { // units are lbs and inches
-    this.species = specimen.species;
-    this.weight = specimen.weight;
-    this.height = specimen.height;
-    this.diet = specimen.diet;
-    this.where = specimen.where;
-    this.when = specimen.when;
-    this.fact = specimen.fact;
+function Dinos(d) { // units are lbs and inches
+    this.species = d.species;
+    this.weight = d.weight;
+    this.height = d.height;
+    this.diet = d.diet;
+    this.where = d.where;
+    this.when = d.when;
+    this.fact = d.fact;
 }
 
-Dinos.prototype.compareWeight = function (weight) { // compare weight in argument to dino weight.
-    if (weight > this.weight) {
-        return `You outweigh a ${this.species} by ${(weight - this.weight).toLocaleString()} pounds.`;
-    } else if (weight < this.weight) {
-        return `A ${this.species} is ${(this.weight - weight).toLocaleString()} pounds heavier than you.`;
-    } else {
-        return `You and a ${this.species} weigh exactly the same.`;
-    }
+Dinos.prototype.compareWeight = function (h) { // compare weight from argument to dino weight.
+    const d = this.weight;
+    const s = this.species;
+    if (h > d) return `You outweigh a ${s} by ${(h - d).toLocaleString()} pounds.`;
+    else if (h < d) return `A ${s} is ${(d - h).toLocaleString()} pounds heavier than you.`;
+    else return `You and a ${s} weigh exactly the same.`;
 };
 
-Dinos.prototype.compareHeight = function (height) {
-    if (height > this.height) { // Execute if human is taller than dinosaur
-        return `You are ${convertInches(height - this.height)} taller than a ${this.species}!`;
-    } else if (height < this.height) { // Execute if dinosaur is taller than human
-        return `A ${this.species} is ${convertInches(this.height - height)} taller than you!`;
-    } else { // execute if neither human nor dinosaur is taller
-        return `You are the same height as a ${this.species}.`;
-    }
+Dinos.prototype.compareHeight = function (h) {
+    const d = this.height;
+    const s = this.species;
+    if (h > d) return `You are ${convertInches(h - d)} taller than a ${s}!`;
+    else if (h < d) return `A ${s} is ${convertInches(d - h)} taller than you!`;
+    else return `You are the same height as a ${s}.`;
 };
 
 Dinos.prototype.compareDiet = function(diet) {
-    const humanDiet = diet.toLowerCase();
-    const dinoDiet = this.diet.toLowerCase();
-    if (humanDiet === dinoDiet) {
-        return `You and ${this.species} are both ${dinoDiet}s.`
-    } else {
-        return `${this.species} is ${(dinoDiet[0] === 'c') ? 'a' : 'an'} ${dinoDiet}.`;
-    }
+    const h = diet.toLowerCase();
+    const d = this.diet.toLowerCase();
+    const s = this.species;
+    if (h === d) return `You and ${s} are both ${d}s.`;
+    else return `${s} is ${(d[0] === 'c') ? 'a' : 'an'} ${d}.`;
 };
 
 Dinos.prototype.geography = function() {
-    switch (this.where) {
+    const s = this.species;
+    const w = this.where;
+    switch (w) {
         case 'North America':
-            return `${this.species} lived in ${this.where}`;
-            break;
+            return `${s} lived in ${w}`;
         case 'North America, Europe, Asia':
-            return `${this.species} could be found in North America, Europe and Asia.`;
-            break;
+            return `${s} could be found in North America, Europe and Asia.`;
         case 'World Wide':
-            return `${this.species} could be found all over the world.`;
-            break;
+            return `${s} could be found all over the world.`;
     }
 };
 
@@ -111,9 +102,9 @@ Dinos.prototype.period = function() {
 };
 
 
-function shuffle(array) {
-    array.sort(() => Math.random() - 0.5);
-}
+// function shuffle(array) {
+//     array.sort(() => Math.random() - 0.5);
+// }
 
 function createGrid(human) { // human variable is accessible here
     const dinosaurs = (function createDinos() {
@@ -151,9 +142,7 @@ function createGrid(human) { // human variable is accessible here
 
                 return randomFact;
                 })();
-            
-            // console.log(`The random fact for ${currentDino.species} is ${currentDino.randomFact}`);
-            
+                        
             dinoArray.push(currentDino);
         }
         dinosaurArray = dinoArray;
